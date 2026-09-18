@@ -493,15 +493,15 @@ export default function Dashboard({
                                         key={shift.id}
                                         className="flex items-center gap-3 rounded-lg border border-slate-100 bg-slate-50/70 p-3"
                                     >
-                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-200 font-bold text-slate-600">
+                                        {/* <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-200 font-bold text-slate-600">
                                             {shift.user.name
                                                 .slice(0, 1)
                                                 .toUpperCase()}
-                                        </div>
+                                        </div> */}
                                         <div className="min-w-0 flex-1">
-                                            <p className="truncate text-sm font-bold text-slate-800">
+                                            {/* <p className="truncate text-sm font-bold text-slate-800">
                                                 {shift.user.name}
-                                            </p>
+                                            </p> */}
                                             <p className="truncate text-xs text-slate-500">
                                                 {shift.outlet?.name ||
                                                     "Tanpa outlet"}{" "}
