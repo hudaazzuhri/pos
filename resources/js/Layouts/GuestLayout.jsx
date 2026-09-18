@@ -9,10 +9,12 @@ export default function GuestLayout({ children }) {
                     <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" />
                 </Link>
             </div>
+            <p className="mt-2 text-4xl font-bold text-gray-800">POS System</p>
 
-            <div className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg">
+            <div className="mt-4 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg">
                 {children}
             </div>
+            <p className="mt-4 text-xs text-gray-500">owned by mikrosysid.com</p>
         </div>
     );
 }

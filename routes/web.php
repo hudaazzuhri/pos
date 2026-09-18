@@ -5,6 +5,7 @@ use App\Http\Controllers\CashDrawerController;
 use App\Http\Controllers\CashierShiftController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\GrossProfitReportController;
@@ -41,13 +42,10 @@ Route::post('/register', [RegisterTenantController::class, 'register'])->name('r
 // --------------------------------------------------------------------------
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // Dashboard Utama Owner
-    Route::get('/', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('/', fn () => redirect()->route('dashboard'));
+    Route::middleware('role:owner,manager')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    });
 
     // ----------------------------------------------------------------------
     // A. TERMINAL KASIR (POS FRONT-END)
@@ -75,7 +73,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('categories/bulk-delete', [CategoryController::class, 'bulkDelete'])->name('categories.bulk-delete');
     Route::resource('products', ProductController::class);
     Route::resource('categories', CategoryController::class);
-    Route::resource('discounts', DiscountController::class);
+    Route::middleware('role:owner,manager')->prefix('discounts')->name('discounts.')->group(function () {
+        Route::get('/', [DiscountController::class, 'index'])->name('index');
+        Route::post('/', [DiscountController::class, 'store'])->name('store');
+        Route::put('/{discount}', [DiscountController::class, 'update'])->name('update');
+        Route::patch('/{discount}/toggle-status', [DiscountController::class, 'toggleStatus'])->name('toggleStatus');
+        Route::delete('/{discount}', [DiscountController::class, 'destroy'])->name('destroy');
+    });
     Route::resource('customers', CustomerController::class);
     Route::post('/shift/open', [CashierShiftController::class, 'openShift'])->name('shift.open');
 

@@ -12,6 +12,7 @@ export default function ProductsCreate({ categories = [] }) {
         buy_price: "",
         sell_price: "",
         stock: "",
+        min_stock_alert: "",
         is_active: true,
         variants: [],
     });

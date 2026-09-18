@@ -12,6 +12,7 @@ export default function ProductEdit({ product, categories = [] }) {
         buy_price: product?.buy_price ?? "",
         sell_price: product?.sell_price ?? "",
         stock: product?.stock ?? "",
+        min_stock_alert: product?.min_stock_alert ?? "",
         is_active: product?.is_active ?? true,
         variants: (product?.variants ?? []).map((variant) => ({
             id: variant.id,

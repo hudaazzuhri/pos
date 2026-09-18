@@ -140,7 +140,9 @@ export default function ProductForm({
                         <TextInput
                             id="name"
                             value={data.name}
-                            onChange={(event) => setData("name", event.target.value)}
+                            onChange={(event) =>
+                                setData("name", event.target.value)
+                            }
                             className="mt-1 block w-full"
                             autoComplete="off"
                         />
@@ -175,7 +177,9 @@ export default function ProductForm({
                         <TextInput
                             id="sku"
                             value={data.sku}
-                            onChange={(event) => setData("sku", event.target.value)}
+                            onChange={(event) =>
+                                setData("sku", event.target.value)
+                            }
                             className="mt-1 block w-full"
                             autoComplete="off"
                         />
@@ -193,10 +197,7 @@ export default function ProductForm({
                             className="mt-1 block w-full"
                             autoComplete="off"
                         />
-                        <InputError
-                            message={errors.barcode}
-                            className="mt-2"
-                        />
+                        <InputError message={errors.barcode} className="mt-2" />
                     </div>
 
                     <div>
@@ -250,10 +251,26 @@ export default function ProductForm({
                             type="number"
                             min="0"
                             value={data.stock}
-                            onChange={(event) => setData("stock", event.target.value)}
+                            onChange={(event) =>
+                                setData("stock", event.target.value)
+                            }
                             className="mt-1 block w-full"
                         />
                         <InputError message={errors.stock} className="mt-2" />
+                    </div>
+                    <div>
+                        <InputLabel htmlFor="min_stock_alert" value="Min. Stok" />
+                        <TextInput
+                            id="min_stock_alert"
+                            type="number"
+                            min="0"
+                            value={data.min_stock_alert}
+                            onChange={(event) =>
+                                setData("min_stock_alert", event.target.value)
+                            }
+                            className="mt-1 block w-full"
+                        />
+                        <InputError message={errors.min_stock_alert} className="mt-2" />
                     </div>
 
                     <div className="flex items-center justify-start pt-6">
@@ -273,7 +290,7 @@ export default function ProductForm({
                     </div>
                 </div>
 
-                <div className="space-y-4 border-t border-gray-200 pt-6">
+                {/* <div className="space-y-4 border-t border-gray-200 pt-6">
                     <div className="flex items-center justify-between gap-4">
                         <div>
                             <h2 className="text-base font-semibold text-gray-900">
@@ -447,15 +464,14 @@ export default function ProductForm({
                     ))}
                     <InputError message={errors.variants} className="mt-2" />
                 </div>
+                 */}
 
                 <div className="flex items-center gap-2 border-t border-gray-200 pt-6">
                     <PrimaryButton
                         disabled={processing}
                         className="!bg-blue-600 !hover:bg-blue-700 !focus:ring-blue-500"
                     >
-                        {processing
-                            ? "Menyimpan..."
-                            : submitLabel}
+                        {processing ? "Menyimpan..." : submitLabel}
                     </PrimaryButton>
                     <Link
                         href={cancelHref}

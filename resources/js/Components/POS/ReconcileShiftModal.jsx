@@ -1,5 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { X } from 'lucide-react';
+import CurrencyInput from '@/Components/CurrencyInput';
 
 export default function ReconcileShiftModal({ open, onClose }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -49,12 +50,9 @@ export default function ReconcileShiftModal({ open, onClose }) {
                         <label className="mb-2 block text-sm font-medium text-slate-700">
                             Kas fisik di laci
                         </label>
-                        <input
-                            type="number"
-                            min="0"
-                            step="0.01"
+                        <CurrencyInput
                             value={data.actual_cash}
-                            onChange={(event) => setData('actual_cash', event.target.value)}
+                            onChange={(value) => setData('actual_cash', value)}
                             className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-indigo-500"
                             placeholder="0"
                             autoFocus

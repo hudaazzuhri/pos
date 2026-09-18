@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\CashDrawerLog;
 use App\Models\CashierShift;
 use App\Models\Category;
+use App\Models\Customer;
 use App\Models\Outlet;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\StockMovement;
+use App\Models\StoreSetting;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
@@ -40,11 +42,18 @@ class TransactionController extends Controller
             ->get();
 
         $categories = Category::all();
+        $customers = Customer::query()->orderBy('name')->get(['id', 'name', 'phone']);
+        $storeSettings = StoreSetting::query()->where('outlet_id', $activeShift?->outlet_id ?? auth()->user()->outlet_id)->first();
 
-        return Inertia::render('POS/Terminal', [
+        return Inertia::render('POS/TerminalRetail', [
             'products' => $products,
             'categories' => $categories,
+            'customers' => $customers,
             'activeShift' => $activeShift,
+            'storeSettings' => $storeSettings ? [
+                ...$storeSettings->toArray(),
+                'logo_url' => $storeSettings->logo_path ? asset('storage/'.$storeSettings->logo_path) : null,
+            ] : null,
         ]);
     }
 
@@ -53,7 +62,6 @@ class TransactionController extends Controller
         $query = Transaction::query()
             ->with(['user:id,name', 'customer:id,name', 'outlet:id,name'])
             ->latest();
-
 
         $outlets = Outlet::query()
             ->get(['id', 'name']);
@@ -79,6 +87,7 @@ class TransactionController extends Controller
             'payment_method' => ['required', 'in:cash,qris,bank_transfer,debit'],
             'paid_amount' => ['required', 'numeric', 'min:0'],
             'discount_amount' => ['nullable', 'numeric', 'min:0'],
+            'extra_charge' => ['nullable', 'numeric', 'min:0'],
         ]);
 
         return DB::transaction(function () use ($validated, $request) {
@@ -153,7 +162,8 @@ class TransactionController extends Controller
             }
 
             $discountAmount = min((float) ($validated['discount_amount'] ?? 0), $subtotal);
-            $totalAmount = $subtotal - $discountAmount;
+            $extraCharge = (float) ($validated['extra_charge'] ?? 0);
+            $totalAmount = $subtotal - $discountAmount + $extraCharge;
             $paidAmount = (float) $validated['paid_amount'];
             $changeAmount = $paidAmount - $totalAmount;
 
@@ -172,7 +182,7 @@ class TransactionController extends Controller
                 'invoice_number' => $invoiceNumber,
                 'subtotal' => $subtotal,
                 'discount_amount' => $discountAmount,
-                'tax_amount' => 0,
+                'tax_amount' => $extraCharge,
                 'total_amount' => $totalAmount,
                 'paid_amount' => $paidAmount,
                 'change_amount' => $changeAmount > 0 ? $changeAmount : 0,

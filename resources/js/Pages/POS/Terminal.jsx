@@ -733,25 +733,11 @@ export default function POSTerminal({
                                     </span>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-2">
-                                    {quickAmounts.map((amount) => (
-                                        <button
-                                            key={amount}
-                                            type="button"
-                                            onClick={() =>
-                                                setData("paid_amount", amount)
-                                            }
-                                            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
-                                        >
-                                            {formatCurrency(amount)}
-                                        </button>
-                                    ))}
-                                </div>
-
                                 <button
                                     type="button"
                                     onClick={handleCheckout}
-                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-600/30 transition hover:bg-indigo-700"
+                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-600/30 transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                                    disabled={cart.length === 0}
                                 >
                                     <CreditCard className="h-5 w-5" />
                                     BAYAR / CHECKOUT (F9)

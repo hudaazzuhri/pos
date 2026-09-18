@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import { X } from 'lucide-react';
 
 export default function OpenShiftModal({ open }) {
@@ -41,7 +41,7 @@ export default function OpenShiftModal({ open }) {
                             step="0.01"
                             value={data.starting_cash}
                             onChange={(event) =>
-                                setData('starting_cash', event.target.value)
+                                setData("starting_cash", event.target.value)
                             }
                             className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-indigo-500"
                             placeholder="0"
@@ -54,13 +54,22 @@ export default function OpenShiftModal({ open }) {
                         )}
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
-                    >
-                        {processing ? 'Membuka shift...' : 'Buka Shift'}
-                    </button>
+                    <div className="grid grid-cols-2 gap-2">
+                        <Link
+                            href={route("logout")}
+                            method="post"
+                            className="w-full text-center rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-300"
+                        >
+                            Log Out
+                        </Link>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                        >
+                            {processing ? "Membuka shift..." : "Buka Shift"}
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

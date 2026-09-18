@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, usePage } from "@inertiajs/react";
 import { navigationMenu } from "@/Config/navigation";
+import ApplicationLogo from "@/Components/ApplicationLogo";
 
 export default function Sidebar() {
     const { auth } = usePage().props;
@@ -18,7 +19,10 @@ export default function Sidebar() {
         <aside className="fixed bg-slate-900 text-slate-300 h-screen flex flex-col border-r border-slate-800 w-72">
             {/* Brand Header */}
             <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-                <span className="font-bold text-white text-lg">MyPOS SaaS</span>
+                <div className="flex items-center gap-3">
+                    <ApplicationLogo className="h-8 w-auto fill-current text-white" />
+                    <span className="font-bold text-white text-lg">POS</span>
+                </div>
                 <span className="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded capitalize">
                     {userRole}
                 </span>

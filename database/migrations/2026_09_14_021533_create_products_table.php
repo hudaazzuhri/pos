@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('buy_price', 12, 2)->default(0);  // HPP Modal
             $table->decimal('sell_price', 12, 2)->default(0); // Harga Jual
             $table->integer('stock')->default(0);
+            $table->string('unit')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
