@@ -14,6 +14,21 @@ use Inertia\Response;
 
 class DiscountController extends Controller
 {
+    public function create(): Response
+    {
+        return Inertia::render('Discounts/Create', [
+            'products' => $this->activeProducts(),
+        ]);
+    }
+
+    public function edit(Discount $discount): Response
+    {
+        return Inertia::render('Discounts/Edit', [
+            'discount' => $discount->load('products:id,name,sku,sell_price'),
+            'products' => $this->activeProducts(),
+        ]);
+    }
+
     public function index(Request $request): Response
     {
         $search = trim((string) $request->query('search', ''));
@@ -32,10 +47,6 @@ class DiscountController extends Controller
 
         return Inertia::render('Discounts/Index', [
             'discounts' => $discounts,
-            'products' => Product::query()
-                ->where('is_active', true)
-                ->orderBy('name')
-                ->get(['id', 'name', 'sku', 'sell_price']),
             'filters' => [
                 'search' => $search,
                 'status' => $status,
@@ -52,7 +63,7 @@ class DiscountController extends Controller
             $this->syncProducts($discount, $validated);
         });
 
-        return back()->with('message', 'Diskon berhasil dibuat.');
+        return redirect()->route('discounts.index')->with('message', 'Diskon berhasil dibuat.');
     }
 
     public function update(Request $request, Discount $discount): RedirectResponse
@@ -64,7 +75,7 @@ class DiscountController extends Controller
             $this->syncProducts($discount, $validated);
         });
 
-        return back()->with('message', 'Diskon berhasil diperbarui.');
+        return redirect()->route('discounts.index')->with('message', 'Diskon berhasil diperbarui.');
     }
 
     public function toggleStatus(Discount $discount): RedirectResponse
@@ -128,9 +139,18 @@ class DiscountController extends Controller
     {
         if (($validated['scope'] ?? null) === 'product') {
             $discount->products()->sync($validated['product_ids'] ?? []);
+
             return;
         }
 
         $discount->products()->detach();
+    }
+
+    private function activeProducts()
+    {
+        return Product::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'sku', 'sell_price']);
     }
 }

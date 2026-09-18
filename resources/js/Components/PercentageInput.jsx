@@ -2,10 +2,12 @@ import { formatCurrency } from "@/Helper/helper";
 import { Label } from "@/Components/ui/label";
 import { cn } from "cn";
 
-
-export default function CurrencyInput({ value, onChange, className = "", ...props }) {
-    const formattedValue = value ? formatCurrency(value) : "";
-
+export default function PercentageInput({
+    value,
+    onChange,
+    className = "",
+    ...props
+}) {
     return (
         <div className="space-y-1">
             {props.label && (
@@ -20,7 +22,12 @@ export default function CurrencyInput({ value, onChange, className = "", ...prop
                 {...props}
                 type="text"
                 inputMode="numeric"
-                value={formattedValue}
+                min={0}
+                max={100}
+                step={0.01}
+                pattern="[0-9]*"
+                placeholder="0.00"
+                value={value}
                 onChange={(event) => {
                     const digits = event.target.value.replace(/[^0-9]/g, "");
                     onChange(Number(digits) || 0);

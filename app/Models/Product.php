@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -30,5 +32,22 @@ class Product extends Model
     public function variants()
     {
         return $this->hasMany(ProductVariant::class);
+    }
+
+    public function discounts(): BelongsToMany
+    {
+        return $this->belongsToMany(Discount::class, 'discount_products');
+    }
+
+    public function activeDiscounts(): BelongsToMany
+    {
+        return $this->discounts()
+            ->where('discounts.scope', 'product')
+            ->active();
+    }
+
+    public function discountProducts(): HasMany
+    {
+        return $this->hasMany(DiscountProduct::class);
     }
 }

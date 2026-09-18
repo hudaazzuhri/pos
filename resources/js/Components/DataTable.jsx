@@ -1,12 +1,12 @@
 import { Link } from "@inertiajs/react";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import TextInput from "@/Components/TextInput";
 import {
     Card,
     CardContent,
     CardFooter,
     CardHeader,
 } from "@/Components/ui/card";
+import { Input } from "@/Components/ui/input";
 
 export default function DataTable({
     data = [],
@@ -39,24 +39,28 @@ export default function DataTable({
                 {hasHeaderControls && (
                     <div className="space-y-4">
                         {(search || filters) && (
-                            <div className={`grid gap-x-3 ${search && filters ? 'md:grid-cols-2' : ''}`}>
+                            <div
+                                className={`grid gap-x-3 ${search && filters ? "md:grid-cols-2" : ""}`}
+                            >
                                 {search ? (
-                                    <form
-                                        onSubmit={
-                                            search.onSubmit ||
-                                            ((event) => event.preventDefault())
-                                        }
-                                        className="flex items-center gap-2"
-                                    >
-                                        <TextInput
-                                            value={search.value ?? ""}
-                                            onChange={search.onChange}
-                                            className="w-full"
-                                            placeholder={
-                                                search.placeholder || "Cari..."
+                                    <div className="col-span-1">
+                                        <form
+                                            onSubmit={
+                                                search.onSubmit ||
+                                                ((event) =>
+                                                    event.preventDefault())
                                             }
-                                        />
-                                    </form>
+                                        >
+                                            <Input
+                                                value={search.value ?? ""}
+                                                onChange={search.onChange}
+                                                placeholder={
+                                                    search.placeholder ||
+                                                    "Cari..."
+                                                }
+                                            />
+                                        </form>
+                                    </div>
                                 ) : (
                                     <div />
                                 )}

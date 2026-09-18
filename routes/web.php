@@ -75,7 +75,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::middleware('role:owner,manager')->prefix('discounts')->name('discounts.')->group(function () {
         Route::get('/', [DiscountController::class, 'index'])->name('index');
+        Route::get('/create', [DiscountController::class, 'create'])->name('create');
         Route::post('/', [DiscountController::class, 'store'])->name('store');
+        Route::get('/{discount}/edit', [DiscountController::class, 'edit'])->name('edit');
         Route::put('/{discount}', [DiscountController::class, 'update'])->name('update');
         Route::patch('/{discount}/toggle-status', [DiscountController::class, 'toggleStatus'])->name('toggleStatus');
         Route::delete('/{discount}', [DiscountController::class, 'destroy'])->name('destroy');

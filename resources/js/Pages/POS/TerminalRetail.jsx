@@ -42,6 +42,38 @@ const cashPresets = [
     { label: "Rp 200.000", value: 200000 },
 ];
 
+function calculateProductDiscount(discounts = [], price, quantity) {
+    const lineSubtotal = Number(price || 0) * Number(quantity || 0);
+
+    if (!lineSubtotal) return 0;
+
+    return discounts.reduce((bestDiscount, discount) => {
+        if (
+            lineSubtotal < Number(discount.min_purchase_amount || 0)
+        ) {
+            return bestDiscount;
+        }
+
+        const discountAmount =
+            discount.type === "percentage"
+                ? (lineSubtotal * Number(discount.value || 0)) / 100
+                : Number(discount.value || 0);
+        const cappedDiscount = discount.max_discount_amount !== null &&
+            discount.max_discount_amount !== undefined &&
+            discount.max_discount_amount !== ""
+            ? Math.min(
+                  discountAmount,
+                  Number(discount.max_discount_amount),
+              )
+            : discountAmount;
+
+        return Math.max(
+            bestDiscount,
+            Math.min(cappedDiscount, lineSubtotal),
+        );
+    }, 0);
+}
+
 export default function POSTerminalRetail({
     products = [],
     customers = [],
@@ -175,7 +207,17 @@ export default function POSTerminalRetail({
         setCart((current) =>
             existing
                 ? current.map((item) =>
-                      item.key === key ? { ...item, qty: item.qty + 1 } : item,
+                      item.key === key
+                          ? {
+                                ...item,
+                                qty: item.qty + 1,
+                                discount: calculateProductDiscount(
+                                    item.active_discounts,
+                                    item.price,
+                                    item.qty + 1,
+                                ),
+                            }
+                          : item,
                   )
                 : [
                       ...current,
@@ -191,7 +233,12 @@ export default function POSTerminalRetail({
                           price: Number(product.sell_price || 0),
                           stock,
                           qty: 1,
-                          discount: 0,
+                          active_discounts: sourceProduct.active_discounts || [],
+                          discount: calculateProductDiscount(
+                              sourceProduct.active_discounts,
+                              product.sell_price,
+                              1,
+                          ),
                       },
                   ],
         );
@@ -230,9 +277,21 @@ export default function POSTerminalRetail({
 
     const updateCart = (key, changes) =>
         setCart((current) =>
-            current.map((item) =>
-                item.key === key ? { ...item, ...changes } : item,
-            ),
+            current.map((item) => {
+                if (item.key !== key) return item;
+
+                const updatedItem = { ...item, ...changes };
+
+                if (Object.prototype.hasOwnProperty.call(changes, "qty")) {
+                    updatedItem.discount = calculateProductDiscount(
+                        item.active_discounts,
+                        item.price,
+                        updatedItem.qty,
+                    );
+                }
+
+                return updatedItem;
+            }),
         );
     const adjustQuantity = (item, amount) =>
         updateCart(item.key, {
@@ -603,16 +662,9 @@ export default function POSTerminalRetail({
                                                 <td className="px-3 py-4 text-right">
                                                     <CurrencyInput
                                                         value={item.discount}
-                                                        onChange={(value) =>
-                                                            updateCart(
-                                                                item.key,
-                                                                {
-                                                                    discount:
-                                                                        value,
-                                                                },
-                                                            )
-                                                        }
-                                                        className="w-24 rounded-lg border-slate-200 px-2 py-1.5 text-right text-xs focus:border-indigo-500 focus:ring-indigo-500"
+                                                        readOnly
+                                                        onChange={() => {}}
+                                                        className="w-24 rounded-lg border-slate-200 bg-slate-50 px-2 py-1.5 text-right text-xs focus:border-indigo-500 focus:ring-indigo-500"
                                                     />
                                                 </td>
                                                 <td className="whitespace-nowrap px-3 py-4 text-right font-bold text-slate-900">
@@ -689,7 +741,7 @@ export default function POSTerminalRetail({
                     <aside className="flex min-h-0 flex-col bg-slate-50">
                         <div className="bg-slate-950 p-5 text-white sm:p-6">
                             <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
-                                Total harga
+                                Total Pembayaran
                             </p>
                             <p className="mt-2 break-words text-4xl font-black tracking-tight sm:text-5xl">
                                 {formatCurrency(total)}
@@ -754,6 +806,18 @@ export default function POSTerminalRetail({
                                     <span>{formatCurrency(subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between text-slate-500">
+                                    <span>Diskon promo</span>
+                                    <span className="text-rose-600">
+                                        -{formatCurrency(itemDiscount)}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-slate-500">
+                                    <span>Diskon nota</span>
+                                    <span className="text-rose-600">
+                                        -{formatCurrency(noteDiscount)}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between border-t border-slate-100 pt-2 font-semibold text-slate-700">
                                     <span>Total diskon</span>
                                     <span className="text-rose-600">
                                         -{formatCurrency(totalDiscount)}

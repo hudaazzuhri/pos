@@ -37,7 +37,7 @@ class TransactionController extends Controller
             ->first();
 
         // Tarik Katalog Produk + Varian (Trait BelongsToTenant otomatis menyaring tenant_id)
-        $products = Product::with(['category', 'variants'])
+        $products = Product::with(['category', 'variants', 'activeDiscounts'])
             ->where('is_active', true)
             ->get();
 
