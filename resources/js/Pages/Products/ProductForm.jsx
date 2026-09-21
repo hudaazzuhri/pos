@@ -1,7 +1,8 @@
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
-import TextInput from "@/Components/TextInput";
+import SelectInput from "@/Components/SelectInput";
+import { Input } from "@/Components/ui/input";
 import { Link } from "@inertiajs/react";
 
 const emptyVariant = () => ({
@@ -38,7 +39,8 @@ export const normalizeCurrencyValue = (value) => {
             decimalSeparator === ","
                 ? sanitized.replace(/\./g, "")
                 : sanitized.replace(/,/g, "");
-        const [integerPart, decimalPart = ""] = separatorless.split(decimalSeparator);
+        const [integerPart, decimalPart = ""] =
+            separatorless.split(decimalSeparator);
 
         return `${integerPart.replace(/\D/g, "")}${decimalPart ? `.${decimalPart.replace(/\D/g, "")}` : ""}`;
     }
@@ -109,9 +111,7 @@ export default function ProductForm({
 
     const updateVariant = (index, field, value) => {
         const nextVariants = variants.map((variant, variantIndex) =>
-            variantIndex === index
-                ? { ...variant, [field]: value }
-                : variant,
+            variantIndex === index ? { ...variant, [field]: value } : variant,
         );
 
         setData("variants", nextVariants);
@@ -136,74 +136,65 @@ export default function ProductForm({
             >
                 <div className="grid gap-6 md:grid-cols-2">
                     <div className="md:col-span-2">
-                        <InputLabel htmlFor="name" value="Nama Produk" />
-                        <TextInput
-                            id="name"
+                        <Input
+                            label="Nama Produk"
                             value={data.name}
                             onChange={(event) =>
                                 setData("name", event.target.value)
                             }
                             className="mt-1 block w-full"
                             autoComplete="off"
+                            required
                         />
-                        <InputError message={errors.name} className="mt-2" />
                     </div>
 
                     <div>
-                        <InputLabel htmlFor="category_id" value="Kategori" />
-                        <select
-                            id="category_id"
+                        <SelectInput
+                            label="Kategori"
                             value={data.category_id}
                             onChange={(event) =>
                                 setData("category_id", event.target.value)
                             }
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        >
-                            <option value="">Pilih Kategori</option>
-                            {categories.map((category) => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
-                        <InputError
-                            message={errors.category_id}
-                            className="mt-2"
+                            options={categories.map((category) => ({
+                                value: category.id,
+                                label: category.name,
+                            }))}
+                            required
                         />
                     </div>
 
                     <div>
-                        <InputLabel htmlFor="sku" value="SKU" />
-                        <TextInput
-                            id="sku"
+                        <Input
+                            label="SKU"
+                            name="sku"
                             value={data.sku}
                             onChange={(event) =>
                                 setData("sku", event.target.value)
                             }
                             className="mt-1 block w-full"
                             autoComplete="off"
+                            required
                         />
-                        <InputError message={errors.sku} className="mt-2" />
                     </div>
 
                     <div>
-                        <InputLabel htmlFor="barcode" value="Barcode" />
-                        <TextInput
-                            id="barcode"
+                        <Input
+                            name="barcode"
+                            label="Barcode"
                             value={data.barcode}
                             onChange={(event) =>
                                 setData("barcode", event.target.value)
                             }
                             className="mt-1 block w-full"
                             autoComplete="off"
+                            required
                         />
-                        <InputError message={errors.barcode} className="mt-2" />
                     </div>
 
                     <div>
-                        <InputLabel htmlFor="buy_price" value="Harga Beli" />
-                        <TextInput
-                            id="buy_price"
+                        <Input
+                            label="Harga Beli"
+                            name="buy_price"
                             type="text"
                             inputMode="decimal"
                             value={formatCurrencyValue(data.buy_price)}
@@ -215,17 +206,14 @@ export default function ProductForm({
                             }
                             className="mt-1 block w-full"
                             placeholder="Rp 0"
-                        />
-                        <InputError
-                            message={errors.buy_price}
-                            className="mt-2"
+                            required
                         />
                     </div>
 
                     <div>
-                        <InputLabel htmlFor="sell_price" value="Harga Jual" />
-                        <TextInput
-                            id="sell_price"
+                        <Input
+                            label="Harga Jual"
+                            name="sell_price"
                             type="text"
                             inputMode="decimal"
                             value={formatCurrencyValue(data.sell_price)}
@@ -237,31 +225,13 @@ export default function ProductForm({
                             }
                             className="mt-1 block w-full"
                             placeholder="Rp 0"
-                        />
-                        <InputError
-                            message={errors.sell_price}
-                            className="mt-2"
+                            required
                         />
                     </div>
-
                     <div>
-                        <InputLabel htmlFor="stock" value="Stok" />
-                        <TextInput
-                            id="stock"
-                            type="number"
-                            min="0"
-                            value={data.stock}
-                            onChange={(event) =>
-                                setData("stock", event.target.value)
-                            }
-                            className="mt-1 block w-full"
-                        />
-                        <InputError message={errors.stock} className="mt-2" />
-                    </div>
-                    <div>
-                        <InputLabel htmlFor="min_stock_alert" value="Min. Stok" />
-                        <TextInput
-                            id="min_stock_alert"
+                        <Input
+                            label="Min. Stok"
+                            name="min_stock_alert"
                             type="number"
                             min="0"
                             value={data.min_stock_alert}
@@ -269,8 +239,8 @@ export default function ProductForm({
                                 setData("min_stock_alert", event.target.value)
                             }
                             className="mt-1 block w-full"
+                            required
                         />
-                        <InputError message={errors.min_stock_alert} className="mt-2" />
                     </div>
 
                     <div className="flex items-center justify-start pt-6">

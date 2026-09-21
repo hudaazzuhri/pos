@@ -37,6 +37,7 @@ class StockOpnameController extends Controller
 
         return Inertia::render('StockOpname/Index', [
             'opnames' => $query->paginate(15)->withQueryString(),
+            'search' => $request->search ?? '',
             'filters' => [
                 'status' => $request->input('status', ''),
                 'date_from' => $request->input('date_from', ''),
@@ -52,7 +53,7 @@ class StockOpnameController extends Controller
             'products' => Product::query()
                 ->where('is_active', true)
                 ->orderBy('name')
-                ->get(['id', 'name', 'sku', 'stock', 'buy_price']),
+                ->get(['id', 'name', 'sku', 'barcode', 'stock', 'buy_price']),
         ]);
     }
 

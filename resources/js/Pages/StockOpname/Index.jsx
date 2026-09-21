@@ -2,22 +2,27 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import DataTable from "@/Components/DataTable";
 import PageHeader from "@/Components/PageHeader";
 import { Head, Link, router } from "@inertiajs/react";
-import { ChevronRight, Search, View } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
+import SelectInput from "@/Components/SelectInput";
+import { Input } from "@/Components/ui/input";
+import { Button } from "@/Components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/popover";
 
-const statusLabels = {
-    draft: "Draft",
-    completed: "Selesai",
-    canceled: "Dibatalkan",
-};
+const statusLabels = [
+    { value: "draft", label: "Draft" },
+    { value: "completed", label: "Selesai" },
+    { value: "canceled", label: "Dibatalkan" }
+];
 const statusClasses = {
     draft: "bg-amber-50 text-amber-700",
     completed: "bg-emerald-50 text-emerald-700",
     canceled: "bg-red-50 text-red-700",
 };
 
-export default function StockOpnameIndex({ opnames, filters = {} }) {
+export default function StockOpnameIndex({ opnames, search = "", filters = {} }) {
     const [status, setStatus] = useState(filters.status ?? "");
+    const [searchTerm, setSearchTerm] = useState(search);
     const [dateFrom, setDateFrom] = useState(filters.date_from ?? "");
     const [dateTo, setDateTo] = useState(filters.date_to ?? "");
 
@@ -29,6 +34,23 @@ export default function StockOpnameIndex({ opnames, filters = {} }) {
             { preserveState: true, replace: true },
         );
     };
+
+    const resetFilters = () => {
+        setSearchTerm("");
+        setStatus("");
+        setDateFrom("");
+        setDateTo("");
+
+        router.get(
+            route("stock-opname.index"),
+            {},
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
+
 
     const columns = useMemo(
         () => [
@@ -115,58 +137,68 @@ export default function StockOpnameIndex({ opnames, filters = {} }) {
         [],
     );
 
+    const hasActiveFilters =
+        searchTerm.trim() !== "" || status !== "" || dateFrom !== "" || dateTo !== "";
     const filterContent = (
-        <form
-            onSubmit={applyFilters}
-            className="flex flex-wrap items-end gap-3"
-        >
-            <div>
-                <label className="text-xs font-semibold text-slate-500">
-                    Status
-                </label>
-                <select
-                    value={status}
-                    onChange={(event) => setStatus(event.target.value)}
-                    className="mt-1 block h-10 rounded-md border-slate-300 text-sm"
+        <div className="flex justify-end">
+            <Popover>
+                <PopoverTrigger
+                    className={[
+                        "relative rounded-md border px-4 py-2 text-sm font-medium transition",
+                        hasActiveFilters
+                            ? "border-orange-300 bg-orange-200 text-black hover:bg-orange-100"
+                            : "border-orange-200 bg-orange-50 text-black hover:bg-orange-100",
+                    ].join(" ")}
                 >
-                    <option value="">Semua status</option>
-                    {Object.entries(statusLabels).map(([value, label]) => (
-                        <option key={value} value={value}>
-                            {label}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div>
-                <label className="text-xs font-semibold text-slate-500">
-                    Dari tanggal
-                </label>
-                <input
-                    type="date"
-                    value={dateFrom}
-                    onChange={(event) => setDateFrom(event.target.value)}
-                    className="mt-1 block h-10 rounded-md border-slate-300 text-sm"
-                />
-            </div>
-            <div>
-                <label className="text-xs font-semibold text-slate-500">
-                    Sampai tanggal
-                </label>
-                <input
-                    type="date"
-                    value={dateTo}
-                    onChange={(event) => setDateTo(event.target.value)}
-                    className="mt-1 block h-10 rounded-md border-slate-300 text-sm"
-                />
-            </div>
-            <button
-                type="submit"
-                className="inline-flex h-10 items-center gap-2 rounded-md bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-700"
-            >
-                <Search className="h-4 w-4" />
-                Filter
-            </button>
-        </form>
+                    <span className="flex items-center gap-2">
+                        <span>Filter</span>
+                        {hasActiveFilters && (
+                            <span className="inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
+                        )}
+                    </span>
+                </PopoverTrigger>
+
+                <PopoverContent align="end" className="w-80 p-4">
+                    <form onSubmit={applyFilters} className="space-y-3">
+                        <SelectInput
+                            label="Status"
+                            value={
+                                statusLabels.find(
+                                    (option) => option.value === status)
+                            }
+                            onChange={(event) => setStatus(event.value)}
+                            options={statusLabels}
+                        />
+                        <Input
+                            label="Dari tanggal"
+                            type="date"
+                            value={dateFrom}
+                            onChange={(event) =>
+                                setDateFrom(event.target.value)
+                            }
+                        />
+                        <Input
+                            label="Sampai tanggal"
+                            type="date"
+                            value={dateTo}
+                            onChange={(event) => setDateTo(event.target.value)}
+                        />
+                        <div className="flex justify-end gap-2">
+                            <Button
+                                type="button"
+                                onClick={resetFilters}
+                                variant="cancel"
+                            >
+                                Reset
+                            </Button>
+                            <Button type="submit" variant="primary">
+                                Terapkan
+                            </Button>
+                        </div>
+                    </form>
+                </PopoverContent>
+            </Popover>
+        </div>
     );
 
     return (
@@ -187,6 +219,12 @@ export default function StockOpnameIndex({ opnames, filters = {} }) {
             <DataTable
                 data={opnames?.data ?? []}
                 columns={columns}
+                search={{
+                    value: searchTerm,
+                    onChange: (event) => setSearchTerm(event.target.value),
+                    onSubmit: applyFilters,
+                    placeholder: "Cari nomor...",
+                }}
                 filters={filterContent}
                 emptyMessage="Belum ada dokumen stock opname."
                 total={opnames?.total ?? 0}

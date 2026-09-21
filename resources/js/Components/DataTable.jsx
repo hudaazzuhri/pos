@@ -40,7 +40,7 @@ export default function DataTable({
                     <div className="space-y-4">
                         {(search || filters) && (
                             <div
-                                className={`grid gap-x-3 ${search && filters ? "md:grid-cols-2" : ""}`}
+                                className={`grid gap-x-3 md:grid-cols-2`}
                             >
                                 {search ? (
                                     <div className="col-span-1">

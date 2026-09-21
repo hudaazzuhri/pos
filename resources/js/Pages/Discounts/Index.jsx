@@ -16,6 +16,8 @@ import {
     XCircle,
 } from "lucide-react";
 import { formatCurrency } from "@/Helper/helper";
+import { Button } from "@/Components/ui/button";
+import SelectInput from "@/Components/SelectInput";
 
 export default function DiscountsIndex({
     discounts,
@@ -26,6 +28,11 @@ export default function DiscountsIndex({
     const [selectedStatus, setSelectedStatus] = useState(
         filters.status || "all",
     );
+    const statusOptions = [
+        { value: "active", label: "Aktif" },
+        { value: "inactive", label: "Non-Aktif" },
+        { value: "expired", label: "Expired" },
+    ];
 
     const applySearch = (event) => {
         event.preventDefault();
@@ -79,17 +86,7 @@ export default function DiscountsIndex({
         () => [
             {
                 accessorKey: "name",
-                header: "Nama Promo",
-                cell: ({ row }) => (
-                    <div>
-                        <p className="font-semibold text-slate-900">
-                            {row.original.name}
-                        </p>
-                        <p className="mt-1 text-xs text-slate-400">
-                            #{row.original.id}
-                        </p>
-                    </div>
-                ),
+                header: "Nama Promo"
             },
             {
                 accessorKey: "value",
@@ -237,22 +234,14 @@ export default function DiscountsIndex({
                 <PopoverContent align="end" className="w-80 p-4">
                     <form onSubmit={applyFilter} className="space-y-3">
                         <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">
-                                Status
-                            </label>
-                            <select
-                                value={selectedStatus}
-                                onChange={(event) =>
-                                    setSelectedStatus(event.target.value)
-                                }
-                                className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                            >
-                                <option value="all">Semua Status</option>
-                                <option value="active">Aktif</option>
-                                <option value="inactive">Non-Aktif</option>
-                                <option value="expired">Expired</option>
-                            </select>
-                        </div>
+                            <SelectInput
+                                label="Status"
+                                value={statusOptions.find((option) => option.value === selectedStatus)}
+                                placeholder="Semua Status"
+                                onChange={(event) => setSelectedStatus(event?.value)}
+                                options={statusOptions}
+                            />
+                            </div>
                         <div className="flex justify-end gap-2">
                             <button
                                 type="button"
@@ -281,11 +270,10 @@ export default function DiscountsIndex({
                 title="Manajemen Diskon & Promo"
                 subtitle="Kelola harga promo berdasarkan transaksi atau produk tertentu."
                 actions={
-                    <Link
-                        href={route("discounts.create")}
-                        className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-indigo-700"
-                    >
-                        <Plus className="h-4 w-4" /> Buat Diskon Baru
+                    <Link href={route("discounts.create")}>
+                        <Button type="button" variant="primary" size="lg">
+                            Tambah Diskon
+                        </Button>
                     </Link>
                 }
             />
@@ -308,7 +296,6 @@ export default function DiscountsIndex({
                     paginationLinks={discounts?.links ?? []}
                 />
             </div>
-
         </AuthenticatedLayout>
     );
 }

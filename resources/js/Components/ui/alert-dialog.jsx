@@ -80,7 +80,7 @@ function AlertDialogFooter({
     <div
       data-slot="alert-dialog-footer"
       className={cn(
-        "flex flex-col-reverse gap-2 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row",
+        "flex flex-col-reverse gap-2 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row justify-end",
         className
       )}
       {...props} />
@@ -143,6 +143,7 @@ const AlertDialogAction = React.forwardRef(function AlertDialogAction(
     <Button
       ref={ref}
       data-slot="alert-dialog-action"
+      variant="primary"
       className={cn(className)}
       {...props}
     />
@@ -151,7 +152,7 @@ const AlertDialogAction = React.forwardRef(function AlertDialogAction(
 
 function AlertDialogCancel({
   className,
-  variant = "outline",
+  variant = "cancel",
   size = "default",
   ...props
 }) {

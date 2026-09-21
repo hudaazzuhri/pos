@@ -3,7 +3,6 @@ import Checkbox from "@/Components/Checkbox";
 import DataTable from "@/Components/DataTable";
 import Modal from "@/Components/Modal";
 import PageHeader from "@/Components/PageHeader";
-import TextInput from "@/Components/TextInput";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -17,6 +16,8 @@ import {
 import { Head, router, useForm } from "@inertiajs/react";
 import { useMemo, useState } from "react";
 import { Edit2, Trash } from "lucide-react";
+import { Input } from "@/Components/ui/input";
+import { Button } from "@/Components/ui/button";
 
 export default function CategoriesIndex({
     categories,
@@ -231,13 +232,10 @@ export default function CategoriesIndex({
 
     const pageHeaderActions = (
         <div className="flex items-center gap-2">
-            <button
-                type="button"
-                onClick={openCreateModal}
-                className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
-            >
-                Tambah Kategori Produk
-            </button>
+
+                <Button variant="primary" size="lg" onClick={openCreateModal}>
+                    Tambah Kategori
+                </Button>
         </div>
     );
 
@@ -316,36 +314,32 @@ export default function CategoriesIndex({
                     </div>
 
                     <div className="mt-6">
-                        <label htmlFor="category-name" className="text-sm font-medium text-slate-700">
-                            Nama Kategori
-                        </label>
-                        <TextInput
-                            id="category-name"
+                        <Input
+                        label="Nama Kategori"
+                            name="category_name"
                             value={categoryData.name}
                             onChange={(event) => setCategoryData("name", event.target.value)}
                             className="mt-2 block w-full"
                             placeholder="Contoh: Minuman"
                             isFocused
+                            required
                         />
-                        {categoryErrors.name && (
-                            <p className="mt-1 text-sm text-red-600">{categoryErrors.name}</p>
-                        )}
                     </div>
 
-                    <div className="mt-6 flex gap-2">
+                    <div className="mt-6 flex items-center justify-end gap-2">
+                        <Button
+                            type="button"
+                            onClick={closeCategoryModal}
+                            variant="cancel"
+                        >
+                            Batal
+                        </Button>
                         <button
                             type="submit"
                             disabled={categoryProcessing}
                             className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             {categoryProcessing ? "Menyimpan..." : "Simpan"}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={closeCategoryModal}
-                            className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                        >
-                            Batal
                         </button>
                     </div>
                 </form>

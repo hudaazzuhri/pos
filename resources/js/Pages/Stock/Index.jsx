@@ -11,6 +11,8 @@ import {
     RotateCcw,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { Button } from "@/Components/ui/button";
+import SelectInput from "@/Components/SelectInput";
 
 const numberFormatter = new Intl.NumberFormat("id-ID");
 
@@ -129,33 +131,35 @@ export default function StockIndex({
 
     const filterContent = (
         <div className="flex gap-2">
-            <select
-                value={selectedCategory}
+            <SelectInput
+                value={categories.find(
+                    (option) => option.value === selectedCategory,
+                )}
                 onChange={(event) => {
-                    setSelectedCategory(event.target.value);
+                    setSelectedCategory(event?.value);
                     router.get(
                         route("stock.index"),
-                        { search: searchTerm, category_id: event.target.value },
+                        { search: searchTerm, category_id: event?.value },
                         { preserveState: true, replace: true },
                     );
                 }}
-                className="h-10 rounded-md border-slate-300 text-sm"
-            >
-                <option value="">Semua kategori</option>
-                {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                        {category.name}
-                    </option>
-                ))}
-            </select>
-            <button
+                options={categories.map((category) => ({
+                    value: category.id,
+                    label: category.name,
+                }))}
+                className="w-60"
+                placeholder="Semua kategori"
+                isClearable
+            />
+            <Button
                 type="button"
                 onClick={resetFilters}
-                className="inline-flex h-10 items-center gap-2 rounded-md border border-slate-300 px-3 text-sm text-slate-600 hover:bg-slate-50"
+                variant="cancel"
+                size="lg"
             >
                 <RotateCcw className="h-4 w-4" />
                 Reset
-            </button>
+            </Button>
         </div>
     );
 
@@ -167,19 +171,16 @@ export default function StockIndex({
                 subtitle="Pantau persediaan dan kelola penyesuaian stok."
                 actions={
                     <div className="flex gap-2">
-                        <Link
-                            href={route("stock.movements.index")}
-                            className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 bg-white hover:bg-indigo-50"
-                        >
-                            <ClipboardList className="h-4 w-4" />
-                            Audit Mutasi
+                        <Link href={route("stock.movements.index")}>
+                            <Button variant="outline" size="lg">
+                                <ClipboardList className="h-4 w-4" />
+                                Audit Mutasi
+                            </Button>
                         </Link>
-                        <Link
-                            href={route("stock.adjustments.create")}
-                            className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
-                        >
-                            <Plus className="h-4 w-4" />
-                            Penyesuaian Stok
+                        <Link href={route("stock.adjustments.create")}>
+                            <Button variant="primary" size="lg">
+                                Tambah Penyesuaian Stok
+                            </Button>
                         </Link>
                     </div>
                 }

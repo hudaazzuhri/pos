@@ -13,6 +13,7 @@ import {
 import { Head, Link, router } from "@inertiajs/react";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/Components/ui/button";
 
 const statusLabels = {
     draft: "Draft",
@@ -50,7 +51,7 @@ export default function StockOpnameShow({ opname }) {
             <div className="space-y-3">
                 <div className="grid gap-3 sm:grid-cols-4">
                     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                        <p className="text-sm text-black font-bold">Status</p>
+                        <p className="text-sm text-gray-500 font-semibold">Status</p>
                         <span
                             className={`mt-2 inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${statusClasses[opname.status]}`}
                         >
@@ -58,13 +59,13 @@ export default function StockOpnameShow({ opname }) {
                         </span>
                     </div>
                     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                        <p className="text-sm text-black font-bold">Item diperiksa</p>
+                        <p className="text-sm text-gray-500 font-semibold">Item diperiksa</p>
                         <p className="mt-2 text-xl font-bold text-slate-900">
                             {opname.total_items_checked}
                         </p>
                     </div>
                     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                        <p className="text-sm text-black font-bold">Total selisih</p>
+                        <p className="text-sm text-gray-500 font-semibold">Total selisih</p>
                         <p
                             className={`mt-2 text-xl font-bold ${opname.total_discrepancy_qty < 0 ? "text-red-600" : "text-emerald-600"}`}
                         >
@@ -73,7 +74,7 @@ export default function StockOpnameShow({ opname }) {
                         </p>
                     </div>
                     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                        <p className="text-sm text-black font-bold">Nilai selisih</p>
+                        <p className="text-sm text-gray-500 font-semibold">Nilai selisih</p>
                         <p className="mt-2 text-xl font-bold text-slate-900">
                             Rp{" "}
                             {Number(
@@ -96,35 +97,36 @@ export default function StockOpnameShow({ opname }) {
                             Detail Penghitungan
                         </h2>
                         {opname.status === "draft" && (
-                            <button
+                            <Button
                                 type="button"
                                 onClick={() => setIsApprovalDialogOpen(true)}
-                                className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
+                                className="bg-green-600 text-white hover:bg-green-500"
+                                size="lg"
                             >
                                 Setujui & Sesuaikan Stok
-                            </button>
+                            </Button>
                         )}
                     </div>
-                    <div className="overflow-x-auto">
+                     <div className="max-h-[32rem] overflow-auto border-t border-slate-200">
                         <table className="min-w-[760px] w-full divide-y divide-slate-200 text-left text-sm">
                             <thead className="bg-slate-50">
                                 <tr>
-                                    <th className="px-4 py-3 font-semibold text-slate-600">
+                                    <th className="sticky top-0 z-10 bg-slate-50 px-4 py-3 font-semibold text-slate-600">
                                         Produk
                                     </th>
-                                    <th className="px-4 py-3 font-semibold text-slate-600">
+                                    <th className="sticky top-0 z-10 bg-slate-50 px-4 py-3 font-semibold text-slate-600">
                                         Sistem
                                     </th>
-                                    <th className="px-4 py-3 font-semibold text-slate-600">
+                                    <th className="sticky top-0 z-10 bg-slate-50 px-4 py-3 font-semibold text-slate-600">
                                         Fisik
                                     </th>
-                                    <th className="px-4 py-3 font-semibold text-slate-600">
+                                    <th className="sticky top-0 z-10 bg-slate-50 px-4 py-3 font-semibold text-slate-600">
                                         Selisih
                                     </th>
-                                    <th className="px-4 py-3 font-semibold text-slate-600">
+                                    <th className="sticky top-0 z-10 bg-slate-50 px-4 py-3 font-semibold text-slate-600">
                                         Nilai Selisih
                                     </th>
-                                    <th className="px-4 py-3 font-semibold text-slate-600">
+                                    <th className="sticky top-0 z-10 bg-slate-50 px-4 py-3 font-semibold text-slate-600">
                                         Catatan
                                     </th>
                                 </tr>
@@ -180,13 +182,13 @@ export default function StockOpnameShow({ opname }) {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={approve}
-                            className="bg-emerald-600 text-white hover:bg-emerald-500"
+                            className="bg-green-600 text-white hover:bg-green-700 border-green-600"
                             >
                             Ya, Setujui
                         </AlertDialogAction>
-                            <AlertDialogCancel>Batal</AlertDialogCancel>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

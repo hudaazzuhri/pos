@@ -2,7 +2,6 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Checkbox from "@/Components/Checkbox";
 import DataTable from "@/Components/DataTable";
 import PageHeader from "@/Components/PageHeader";
-import TextInput from "@/Components/TextInput";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -18,9 +17,11 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/Components/ui/popover";
-import { Head, router } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { useMemo, useState } from "react";
 import { Edit2, Trash } from "lucide-react";
+import SelectInput from "@/Components/SelectInput";
+import { Button } from "@/Components/ui/button";
 
 export default function ProductsIndex({
     products,
@@ -270,7 +271,18 @@ export default function ProductsIndex({
                             <label className="mb-1 block text-sm font-medium text-gray-700">
                                 Kategori
                             </label>
-                            <select
+                            <SelectInput
+                                value={selectedCategory}
+                                options={categories.map((category) => ({
+                                    value: category.id,
+                                    label: category.name,
+                                }))}
+                                placeholder="Semua Kategori"
+                                onChange={(event) =>
+                                    setSelectedCategory(event.target.value)
+                                }
+                            />
+                            {/* <select
                                 value={selectedCategory}
                                 onChange={(event) =>
                                     setSelectedCategory(event.target.value)
@@ -286,7 +298,7 @@ export default function ProductsIndex({
                                         {category.name}
                                     </option>
                                 ))}
-                            </select>
+                            </select> */}
                         </div>
 
                         <div className="flex justify-end gap-2">
@@ -321,12 +333,13 @@ export default function ProductsIndex({
 
     const pageHeaderActions = (
         <div className="flex items-center gap-2">
-            <a
+            <Link
                 href={route("products.create")}
-                className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
-            >
-                Tambah Produk
-            </a>
+                >
+                    <Button variant="primary" size="lg">
+                        Tambah Produk
+                    </Button>
+                </Link>
         </div>
     );
 
