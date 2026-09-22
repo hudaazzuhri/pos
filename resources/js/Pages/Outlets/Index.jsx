@@ -2,7 +2,6 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Checkbox from "@/Components/Checkbox";
 import DataTable from "@/Components/DataTable";
 import PageHeader from "@/Components/PageHeader";
-import TextInput from "@/Components/TextInput";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -13,11 +12,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/Components/ui/alert-dialog";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/Components/ui/popover";
 import { Head, router } from "@inertiajs/react";
 import { useMemo, useState } from "react";
 import { Edit2, Trash } from "lucide-react";

@@ -102,7 +102,7 @@ export default function StockOpnameCreate({ products = [], outlet }) {
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
                                     <h2 className="text-lg font-semibold text-slate-900">
-                                        Lembar Penghitungan Fisik
+                                        Penghitungan Fisik
                                     </h2>
                                     <p className="text-xs text-slate-500">
                                         Stok sistem disnapshot saat draft
@@ -252,7 +252,7 @@ export default function StockOpnameCreate({ products = [], outlet }) {
                 </form>
 
                 <div className="flex flex-col-reverse gap-2 border-t border-slate-200 bg-white p-4 sm:flex-row sm:items-center justify-end">
-                    <Link href={cancelHref}>
+                    <Link href={route("stock-opname.index")}>
                         <Button variant="cancel" size="lg">
                             Batal
                         </Button>

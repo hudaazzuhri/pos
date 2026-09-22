@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use App\Traits\BelongsToTenant;
+use App\Traits\HasAuditActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Transaction extends Model
 {
-    use BelongsToTenant;
+    use BelongsToTenant, HasAuditActivity, LogsActivity;
 
     protected $fillable = [
         'tenant_id',

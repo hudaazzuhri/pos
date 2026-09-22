@@ -90,7 +90,7 @@ export const navigationMenu = [
                 badge: null,
             },
             {
-                title: "Pelanggan (CRM)",
+                title: "Pelanggan",
                 icon: "UsersIcon",
                 routeName: "customers.index",
                 roles: ["owner", "manager", "cashier"],
@@ -118,8 +118,8 @@ export const navigationMenu = [
             {
                 title: "Audit Log (Aktivitas Staff)",
                 icon: "ShieldAlertIcon",
-                routeName: "reports.audit-logs",
-                roles: ["owner"],
+                routeName: "audit-logs.index",
+                roles: ["owner", "manager"],
                 badge: null,
             },
         ],

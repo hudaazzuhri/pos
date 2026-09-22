@@ -8,6 +8,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/Components/ui/popover";
+import { formatDateTime } from "@/Helper/helper";
 
 export default function TransactionsIndex({
     transactions,
@@ -65,9 +66,7 @@ export default function TransactionsIndex({
                             {row.original.invoice_number}
                         </p>
                         <p className="mt-1 text-xs text-slate-500">
-                            {new Date(row.original.created_at).toLocaleString(
-                                "id-ID",
-                            )}
+                            {formatDateTime(row.original.created_at)}
                         </p>
                     </div>
                 ),

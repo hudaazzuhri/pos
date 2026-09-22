@@ -2,63 +2,75 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class CustomerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request): Response
     {
-        //
+        $search = trim($request->string('search')->toString());
+
+        $customers = Customer::query()
+            ->when($search !== '', fn (Builder $query) => $query->where(function (Builder $query) use ($search): void {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+            }))
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('Customers/Index', [
+            'customers' => $customers,
+            'search' => $search,
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(): RedirectResponse
     {
-        //
+        return redirect()->route('customers.index');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        //
+        Customer::create($this->validated($request));
+
+        return redirect()->route('customers.index')->with('message', 'Pelanggan berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Customer $customer): RedirectResponse
     {
-        //
+        return redirect()->route('customers.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Customer $customer): RedirectResponse
     {
-        //
+        return redirect()->route('customers.index');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Customer $customer): RedirectResponse
     {
-        //
+        $customer->update($this->validated($request));
+
+        return redirect()->route('customers.index')->with('message', 'Data pelanggan berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Customer $customer): RedirectResponse
     {
-        //
+        $customer->delete();
+
+        return redirect()->route('customers.index')->with('message', 'Pelanggan berhasil dihapus.');
+    }
+
+    private function validated(Request $request): array
+    {
+        return $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:20'],
+        ]);
     }
 }

@@ -7,12 +7,17 @@ import { useMemo, useState } from "react";
 import SelectInput from "@/Components/SelectInput";
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/popover";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/Components/ui/popover";
+import { formatDateTime } from "@/Helper/helper";
 
 const statusLabels = [
     { value: "draft", label: "Draft" },
     { value: "completed", label: "Selesai" },
-    { value: "canceled", label: "Dibatalkan" }
+    { value: "canceled", label: "Dibatalkan" },
 ];
 const statusClasses = {
     draft: "bg-amber-50 text-amber-700",
@@ -20,7 +25,11 @@ const statusClasses = {
     canceled: "bg-red-50 text-red-700",
 };
 
-export default function StockOpnameIndex({ opnames, search = "", filters = {} }) {
+export default function StockOpnameIndex({
+    opnames,
+    search = "",
+    filters = {},
+}) {
     const [status, setStatus] = useState(filters.status ?? "");
     const [searchTerm, setSearchTerm] = useState(search);
     const [dateFrom, setDateFrom] = useState(filters.date_from ?? "");
@@ -51,7 +60,6 @@ export default function StockOpnameIndex({ opnames, search = "", filters = {} })
         );
     };
 
-
     const columns = useMemo(
         () => [
             {
@@ -63,9 +71,7 @@ export default function StockOpnameIndex({ opnames, search = "", filters = {} })
                             {row.original.opname_number}
                         </p>
                         <p className="mt-1 text-xs text-slate-500">
-                            {new Date(row.original.created_at).toLocaleString(
-                                "id-ID",
-                            )}
+                            {formatDateTime(row.original.created_at)}
                         </p>
                     </div>
                 ),
@@ -115,9 +121,9 @@ export default function StockOpnameIndex({ opnames, search = "", filters = {} })
                 header: "Status",
                 cell: ({ row }) => (
                     <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClasses[row.original.status]}`}
+                        className={`rounded-full px-2.5 py-1 text-xs ${statusClasses[row.original.status]}`}
                     >
-                        {statusLabels[row.original.status]}
+                        {statusLabels.find((option) => option.value === row.original.status)?.label}
                     </span>
                 ),
             },
@@ -138,7 +144,10 @@ export default function StockOpnameIndex({ opnames, search = "", filters = {} })
     );
 
     const hasActiveFilters =
-        searchTerm.trim() !== "" || status !== "" || dateFrom !== "" || dateTo !== "";
+        searchTerm.trim() !== "" ||
+        status !== "" ||
+        dateFrom !== "" ||
+        dateTo !== "";
     const filterContent = (
         <div className="flex justify-end">
             <Popover>
@@ -162,10 +171,9 @@ export default function StockOpnameIndex({ opnames, search = "", filters = {} })
                     <form onSubmit={applyFilters} className="space-y-3">
                         <SelectInput
                             label="Status"
-                            value={
-                                statusLabels.find(
-                                    (option) => option.value === status)
-                            }
+                            value={statusLabels.find(
+                                (option) => option.value === status,
+                            )}
                             onChange={(event) => setStatus(event.value)}
                             options={statusLabels}
                         />
@@ -208,11 +216,10 @@ export default function StockOpnameIndex({ opnames, search = "", filters = {} })
                 title="Stock Opname"
                 subtitle="Penghitungan dan audit stok fisik per outlet."
                 actions={
-                    <Link
-                        href={route("stock-opname.create")}
-                        className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
-                    >
-                        Buat Stock Opname
+                    <Link href={route("stock-opname.create")}>
+                        <Button variant="primary" size="lg">
+                            Buat Stock Opname
+                        </Button>
                     </Link>
                 }
             />

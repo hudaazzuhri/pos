@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\RegisterTenantController;
 use App\Http\Controllers\CashDrawerController;
 use App\Http\Controllers\CashierShiftController;
@@ -45,6 +46,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/', fn () => redirect()->route('dashboard'));
     Route::middleware('role:owner,manager')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::prefix('audit-logs')->name('audit-logs.')->group(function () {
+            Route::get('/', [AuditLogController::class, 'index'])->name('index');
+            Route::get('/export', [AuditLogController::class, 'export'])->name('export');
+            Route::get('/{auditLog}', [AuditLogController::class, 'show'])->name('show');
+        });
     });
 
     // ----------------------------------------------------------------------

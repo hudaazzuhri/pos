@@ -39,6 +39,10 @@ export const formatShortDateTime = (date) => {
     }).format(d);
 };
 
+export const formatDateTime = (date) => {
+    if (!date) return "";
+    return new Date(date).toLocaleString("id-ID");
+};
 
 export const formatCurrency = (value) =>
     new Intl.NumberFormat("id-ID", {

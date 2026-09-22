@@ -1,9 +1,10 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import DataTable from "@/Components/DataTable";
 import PageHeader from "@/Components/PageHeader";
-import { Head } from "@inertiajs/react";
-import {  Clock3, UserRound } from "lucide-react";
-import { useMemo } from "react";
+import { Head, router } from "@inertiajs/react";
+import { Clock3, UserRound } from "lucide-react";
+import { useMemo, useState } from "react";
+import { formatDateTime } from "@/Helper/helper";
 
 const currencyFormatter = new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -11,19 +12,10 @@ const currencyFormatter = new Intl.NumberFormat("id-ID", {
     maximumFractionDigits: 0,
 });
 
-const dateFormatter = new Intl.DateTimeFormat("id-ID", {
-    dateStyle: "medium",
-    timeStyle: "short",
-});
-
 function formatCurrency(value) {
     return value === null || value === undefined
         ? "-"
         : currencyFormatter.format(Number(value));
-}
-
-function formatDate(value) {
-    return value ? dateFormatter.format(new Date(value)) : "-";
 }
 
 function formatDuration(openedAt, closedAt) {
@@ -57,7 +49,19 @@ function StatusBadge({ status }) {
     );
 }
 
-export default function CashierShiftIndex({ shifts }) {
+export default function CashierShiftIndex({ shifts, filters = {} }) {
+    const [searchTerm, setSearchTerm] = useState(filters.search || "");
+    const applySearch = (event) => {
+        event.preventDefault();
+        router.get(
+            route("discounts.index"),
+            { search: searchTerm },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
     const columns = useMemo(
         () => [
             {
@@ -66,7 +70,7 @@ export default function CashierShiftIndex({ shifts }) {
                 cell: ({ row }) => (
                     <div className="min-w-44">
                         <p className="font-semibold text-slate-900">
-                            {formatDate(row.original.opened_at)}
+                            {formatDateTime(row.original.opened_at)}
                         </p>
                         <p className="mt-1 flex items-center gap-1 text-xs text-slate-500">
                             <Clock3 className="h-3.5 w-3.5" />
@@ -81,9 +85,7 @@ export default function CashierShiftIndex({ shifts }) {
             {
                 accessorKey: "user",
                 header: "Kasir",
-                cell: ({ row }) => (
-                            row.original.user?.name ?? "-"
-                ),
+                cell: ({ row }) => row.original.user?.name ?? "-",
             },
             {
                 accessorKey: "outlet",
@@ -136,7 +138,7 @@ export default function CashierShiftIndex({ shifts }) {
             {
                 accessorKey: "closed_at",
                 header: "Ditutup",
-                cell: ({ row }) => formatDate(row.original.closed_at),
+                cell: ({ row }) => formatDateTime(row.original.closed_at),
             },
         ],
         [],
@@ -152,6 +154,12 @@ export default function CashierShiftIndex({ shifts }) {
 
             <DataTable
                 data={shifts?.data ?? []}
+                search={{
+                    value: searchTerm,
+                    onChange: (event) => setSearchTerm(event.target.value),
+                    onSubmit: applySearch,
+                    placeholder: "Cari nama promo...",
+                }}
                 columns={columns}
                 emptyMessage="Belum ada history shift kasir."
                 total={shifts?.total ?? 0}

@@ -20,6 +20,7 @@ export default function DataTable({
     from = 0,
     to = 0,
     paginationLinks = [],
+    onRowClick = null,
 }) {
     const table = useReactTable({
         data,
@@ -102,7 +103,7 @@ export default function DataTable({
 
             <CardContent className="!p-0">
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200 text-left text-sm">
+                    <table className="min-w-full max-w-full divide-y divide-gray-200 text-left text-sm">
                         <thead className="bg-gray-50">
                             {table.getHeaderGroups().map((headerGroup) => (
                                 <tr key={headerGroup.id}>
@@ -124,12 +125,13 @@ export default function DataTable({
                             ))}
                         </thead>
 
-                        <tbody className="divide-y divide-gray-200 bg-white">
+                        <tbody className="divide-y divide-gray-200 bg-white overflow-x-auto">
                             {table.getRowModel().rows.length ? (
                                 table.getRowModel().rows.map((row) => (
                                     <tr
                                         key={row.id}
-                                        className="hover:bg-gray-50"
+                                        onClick={() => onRowClick?.(row.original)}
+                                        className={onRowClick ? "cursor-pointer hover:bg-gray-50" : "hover:bg-gray-50"}
                                     >
                                         {row.getVisibleCells().map((cell) => (
                                             <td

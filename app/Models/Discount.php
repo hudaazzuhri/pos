@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Traits\BelongsToTenant;
+use App\Traits\HasAuditActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Discount extends Model
 {
-    use BelongsToTenant;
+    use BelongsToTenant, HasAuditActivity, LogsActivity;
 
     protected $fillable = [
         'tenant_id',
@@ -40,8 +42,8 @@ class Discount extends Model
         $now = now();
 
         return $this->is_active &&
-            (!$this->start_date || $this->start_date <= $now) &&
-            (!$this->end_date || $this->end_date >= $now);
+            (! $this->start_date || $this->start_date <= $now) &&
+            (! $this->end_date || $this->end_date >= $now);
     }
 
     public function scopeActive($query)

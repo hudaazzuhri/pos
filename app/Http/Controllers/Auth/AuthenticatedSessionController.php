@@ -32,7 +32,21 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
 
-        $user = auth()->user();
+        $user = Auth::user();
+
+        activity()
+            ->useLog('auth')
+            ->event('login')
+            ->causedBy($user->getAuthIdentifier())
+            ->tap(function ($activity) use ($user): void {
+                $activity->tenant_id = $user?->tenant_id;
+                $activity->outlet_id = $user?->outlet_id;
+                $activity->properties = collect(['metadata' => array_filter([
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ])]);
+            })
+            ->log('User logged in');
 
         // Redirect berdasarkan Role
         if ($user->role == 'cashier') {
@@ -47,6 +61,24 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = Auth::user();
+
+        if ($user) {
+            activity()
+                ->useLog('auth')
+                ->event('logout')
+                ->causedBy($user->getAuthIdentifier())
+                ->tap(function ($activity) use ($user, $request): void {
+                    $activity->tenant_id = $user->tenant_id;
+                    $activity->outlet_id = $user->outlet_id;
+                    $activity->properties = collect(['metadata' => array_filter([
+                        'ip_address' => $request->ip(),
+                        'user_agent' => $request->userAgent(),
+                    ])]);
+                })
+                ->log('User logged out');
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
