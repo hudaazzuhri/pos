@@ -85,7 +85,7 @@ class EmployeeController extends Controller
             'is_active' => true,
         ]);
 
-        return back()->with('message', 'Karyawan berhasil ditambahkan.');
+        return redirect()->route('employees.index')->with('message', 'Karyawan berhasil ditambahkan.');
     }
 
     public function update(Request $request, User $employee): RedirectResponse

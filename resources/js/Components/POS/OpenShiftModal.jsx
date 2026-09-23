@@ -1,9 +1,12 @@
-import { Link, useForm } from '@inertiajs/react';
-import { X } from 'lucide-react';
+import { Link, useForm, usePage } from "@inertiajs/react";
+import { X } from "lucide-react";
+import { Button } from "../ui/button";
+import CurrencyInput from "../CurrencyInput";
 
 export default function OpenShiftModal({ open }) {
+    const { user } = usePage().props.auth;
     const { data, setData, post, processing, errors } = useForm({
-        starting_cash: '',
+        starting_cash: "",
     });
 
     if (!open) {
@@ -12,7 +15,7 @@ export default function OpenShiftModal({ open }) {
 
     const submit = (event) => {
         event.preventDefault();
-        post(route('pos.shift.open'));
+        post(route("pos.shift.open"));
     };
 
     return (
@@ -30,46 +33,54 @@ export default function OpenShiftModal({ open }) {
                     <X className="h-5 w-5 text-slate-400" />
                 </div>
 
-                <form onSubmit={submit} className="mt-5 space-y-4">
+                <form onSubmit={submit} className="mt-5">
                     <div>
-                        <label className="mb-2 block text-sm font-medium text-slate-700">
-                            Modal awal
-                        </label>
-                        <input
-                            type="number"
-                            min="0"
-                            step="0.01"
+                        <CurrencyInput
+                            label="Modal Awal"
                             value={data.starting_cash}
-                            onChange={(event) =>
-                                setData("starting_cash", event.target.value)
+                            onChange={(value) =>
+                                setData("starting_cash", value)
                             }
-                            className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-indigo-500"
                             placeholder="0"
                             autoFocus
                         />
-                        {errors.starting_cash && (
-                            <p className="mt-2 text-sm text-red-600">
-                                {errors.starting_cash}
-                            </p>
-                        )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                        <Link
-                            href={route("logout")}
-                            method="post"
-                            className="w-full text-center rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-300"
-                        >
-                            Log Out
-                        </Link>
-                        <button
+                    <div className="mt-6 grid grid-cols-2 gap-2">
+                        {user.role === "owner" && (
+                            <Link href={route("dashboard")} className="w-full">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full"
+                                    size="lg"
+                                >
+                                    Back To Dashboard
+                                </Button>
+                            </Link>
+                        )}
+                        {user.role === "cashier" && (
+                            <Link href={route("logout")} method="post">
+                                <Button
+                                    type="button"
+                                    variant="cancel"
+                                    className="w-full"
+                                    size="lg"
+                                >
+                                    Log Out
+                                </Button>
+                            </Link>
+                        )}
+                        <Button
                             type="submit"
                             disabled={processing}
-                            className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                            variant="primary"
+                            size="lg"
                         >
                             {processing ? "Membuka shift..." : "Buka Shift"}
-                        </button>
+                        </Button>
                     </div>
+                    <div className="w-full"></div>
                 </form>
             </div>
         </div>
