@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TenantSubscription extends Model
 {
@@ -11,22 +12,24 @@ class TenantSubscription extends Model
 
     protected $fillable = [
         'tenant_id',
-        'package_name',
-        'max_users',
-        'amount',
-        'payment_status',
-        'snap_token',
+        'plan_id',
+        'status',
+        'payment_gateway_reference',
         'starts_at',
-        'expires_at',
+        'ends_at',
+        'payment_status'
     ];
 
     protected function casts(): array
     {
         return [
-            'max_users' => 'integer',
-            'amount' => 'decimal:2',
             'starts_at' => 'datetime',
-            'expires_at' => 'datetime',
+            'ends_at' => 'datetime',
         ];
+    }
+
+    public function plan(): BelongsTo
+    {
+        return $this->belongsTo(Plan::class);
     }
 }

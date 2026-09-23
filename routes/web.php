@@ -66,7 +66,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/shift/close', [CashierShiftController::class, 'closeShift'])->name('shift.close');
 
         // Checkout & Void
-        Route::post('/checkout', [TransactionController::class, 'store'])->name('checkout');
+        Route::post('/checkout', [TransactionController::class, 'store'])->middleware('limit:transaction')->name('checkout');
         Route::post('/transactions/{transaction}/void', [VoidTransactionController::class, 'store'])->name('void');
         Route::post('/cash-drawer/open-manual', [CashDrawerController::class, 'openManual'])->name('cash-drawer.open-manual');
         Route::post('/cash-drawer/movement', [CashDrawerController::class, 'storeMovement'])->name('cash-drawer.movement');
@@ -77,7 +77,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ----------------------------------------------------------------------
     Route::delete('products/bulk-delete', [ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
     Route::delete('categories/bulk-delete', [CategoryController::class, 'bulkDelete'])->name('categories.bulk-delete');
-    Route::resource('products', ProductController::class);
+    Route::resource('products', ProductController::class)->except(['store']);
+    Route::post('products', [ProductController::class, 'store'])->middleware('limit:product')->name('products.store');
     Route::resource('categories', CategoryController::class);
     Route::middleware('role:owner,manager')->prefix('discounts')->name('discounts.')->group(function () {
         Route::get('/', [DiscountController::class, 'index'])->name('index');
@@ -137,9 +138,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ----------------------------------------------------------------------
     // D. TENANT & PROFIL USER
     // ----------------------------------------------------------------------
-    Route::resource('outlets', OutletController::class);
-    Route::resource('users', UserController::class);
-    Route::resource('subscriptions', SubscriptionController::class);
+    Route::delete('outlets/bulk-delete', [OutletController::class, 'bulkDelete'])->name('outlets.bulk-delete');
+    Route::resource('outlets', OutletController::class)->except(['store', 'create', 'edit']);
+    Route::post('outlets', [OutletController::class, 'store'])->middleware('limit:outlet')->name('outlets.store');
+    Route::resource('users', UserController::class)->except(['store']);
+    Route::post('users', [UserController::class, 'store'])->middleware('limit:user')->name('users.store');
+    Route::resource('subscriptions', SubscriptionController::class)->only(['index', 'store']);
     Route::get('/settings', [StoreSettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [StoreSettingController::class, 'update'])->name('settings.update');
 
