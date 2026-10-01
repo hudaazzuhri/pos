@@ -1,5 +1,6 @@
 import { Head, router, useForm, usePage } from "@inertiajs/react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
     Barcode,
     Banknote,
@@ -83,6 +84,7 @@ export default function POSTerminalRetail({
     const { props } = usePage();
     const user = props.auth?.user || {};
     const scannerRef = useRef(null);
+    const printInProgressRef = useRef(false);
     const [scanValue, setScanValue] = useState("");
     const [cart, setCart] = useState([]);
     const [customerId, setCustomerId] = useState(customers[0]?.id ?? "");
@@ -106,6 +108,22 @@ export default function POSTerminalRetail({
         paid_amount: 0,
         discount_amount: 0,
     });
+
+    const printCurrentReceipt = () => {
+        if (!successData || printInProgressRef.current) return;
+
+        printInProgressRef.current = true;
+        const restorePrintMode = () => {
+            document.body.classList.remove("printing-receipt");
+            printInProgressRef.current = false;
+        };
+
+        document.body.classList.add("printing-receipt");
+        window.addEventListener("afterprint", restorePrintMode, {
+            once: true,
+        });
+        window.print();
+    };
 
     useEffect(() => {
         scannerRef.current?.focus();
@@ -142,13 +160,7 @@ export default function POSTerminalRetail({
             }
             if (event.key.toLowerCase() === "p" && successData) {
                 event.preventDefault();
-                document.body.classList.add("printing-receipt");
-                window.addEventListener(
-                    "afterprint",
-                    () => document.body.classList.remove("printing-receipt"),
-                    { once: true },
-                );
-                window.print();
+                printCurrentReceipt();
             }
         };
         window.addEventListener("keydown", handleKeyDown);
@@ -879,6 +891,7 @@ export default function POSTerminalRetail({
                     data={successData}
                     settings={storeSettings}
                     onNew={resetTransaction}
+                    onPrint={printCurrentReceipt}
                 />
             )}
 
@@ -1076,39 +1089,39 @@ function ConfirmModal({
     );
 }
 
-function SuccessModal({ data, settings, onNew }) {
+function SuccessModal({ data, settings, onNew, onPrint }) {
     const paperWidth = settings?.paper_size === "80mm" ? "max-w-[360px]" : "max-w-[300px]";
+    const printWidth = settings?.paper_size === "80mm" ? "90mm" : "58mm";
     const receiptRef = useRef(null);
 
-    const printReceipt = () => {
-        const restorePrintMode = () => {
-            document.body.classList.remove("printing-receipt");
-            window.removeEventListener("afterprint", restorePrintMode);
-        };
-
-        document.body.classList.add("printing-receipt");
-        window.addEventListener("afterprint", restorePrintMode);
-        window.print();
-    };
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/70 p-4 backdrop-blur-sm">
+    return createPortal(
+        <div className="receipt-modal-root fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/70 p-4 backdrop-blur-sm">
             <style>{`
                 @media print {
                     @page { margin: 0; }
+                    body.printing-receipt > *:not(.receipt-modal-root) { display: none !important; }
+                    body.printing-receipt .receipt-modal-root,
+                    body.printing-receipt .receipt-modal-content,
+                    body.printing-receipt .receipt-preview-container { display: contents !important; }
+                    body.printing-receipt .receipt-modal-content > :not(.receipt-preview-container) { display: none !important; }
                     body.printing-receipt * { visibility: hidden !important; }
                     body.printing-receipt #receipt-print-area,
                     body.printing-receipt #receipt-print-area * { visibility: visible !important; }
                     body.printing-receipt #receipt-print-area {
+                        display: block !important;
                         position: absolute;
                         top: 0;
                         left: 0;
+                        width: var(--receipt-print-width);
+                        min-width: var(--receipt-print-width);
+                        max-width: none;
+                        box-sizing: border-box;
                         margin: 0;
                         box-shadow: none !important;
                     }
                 }
             `}</style>
-            <div className="my-auto w-full max-w-2xl rounded-2xl bg-white p-5 shadow-2xl sm:p-6">
+            <div className="receipt-modal-content my-auto w-full max-w-2xl rounded-2xl bg-white p-5 shadow-2xl sm:p-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
@@ -1133,10 +1146,11 @@ function SuccessModal({ data, settings, onNew }) {
                     </button>
                 </div>
 
-                <div className="mt-5 rounded-xl bg-slate-100 p-4 sm:p-6">
+                <div className="receipt-preview-container mt-5 rounded-xl bg-slate-100 p-4 sm:p-6">
                     <div
                         ref={receiptRef}
                         id="receipt-print-area"
+                        style={{ "--receipt-print-width": printWidth }}
                         className={`mx-auto overflow-hidden bg-white px-5 py-6 font-mono text-[11px] text-slate-800 shadow-md ${paperWidth}`}
                     >
                         <div className="space-y-1 text-center">
@@ -1156,14 +1170,14 @@ function SuccessModal({ data, settings, onNew }) {
                             </p>
                         </div>
                         <div className="my-4 border-t border-dashed border-slate-400" />
-                        <div className="mb-2 flex justify-between text-[10px]">
+                        <div className="mb-1 flex justify-between text-[11px]">
                             <span className="font-bold">{data.invoice}</span>
                             <span>{new Date().toLocaleString("id-ID")}</span>
                         </div>
-                        <div className="mb-2 text-[10px] text-slate-500">
+                        <div className="text-[10px] text-black">
                             Kasir: {data.cashierName}
                         </div>
-                        <div className="mb-3 text-[10px] text-slate-500">
+                        <div className="mb-3 text-[10px] text-black">
                             Pelanggan: {data.customerName}
                         </div>
                         <div className="my-4 border-t border-dashed border-slate-400" />
@@ -1176,7 +1190,14 @@ function SuccessModal({ data, settings, onNew }) {
                                             {item.variant_name
                                                 ? ` - ${item.variant_name}`
                                                 : ""}{" "}
-                                            x{item.qty}
+                                            <span className="ml-3">
+                                                {formatCurrency(item.price)
+                                                    .replace("Rp", "")
+                                                    .trim()}
+                                            </span>
+                                            <span className="ml-3">
+                                                x{item.qty}
+                                            </span>
                                         </span>
                                         <span className="shrink-0">
                                             {formatCurrency(
@@ -1274,7 +1295,7 @@ function SuccessModal({ data, settings, onNew }) {
                     </button>
                     <button
                         type="button"
-                        onClick={printReceipt}
+                        onClick={onPrint}
                         className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-black text-white hover:bg-indigo-700"
                     >
                         <Printer className="h-4 w-4" /> Cetak Struk{" "}
@@ -1284,7 +1305,8 @@ function SuccessModal({ data, settings, onNew }) {
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body,
     );
 }
 
